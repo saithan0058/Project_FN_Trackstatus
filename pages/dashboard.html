@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Statistics</title>
+    <link rel="stylesheet" href="/Project_FN_Trackstatus/pages/CSS/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+    <script src="/layouts/layoutprofile.html"></script>
+    <div class="container">
+        <div class="total">
+            <div class="chart total-chart">
+                <canvas id="totalChart"></canvas>
+            </div>
+            <div class="total-details">
+                <div class="detail blue">
+                    <p>Total of student</p>
+                    <p class="number">81</p>
+                </div>
+                <div class="detail red">
+                    <p>Total of Retire</p>
+                    <p class="number">9</p>
+                </div>
+                <div class="detail green">
+                    <p>Total of Studying</p>
+                    <p class="number">60</p>
+                </div>
+                <div class="detail yellow">
+                    <p>Total of Graduate</p>
+                    <p class="number">2</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <div class="category-item">
+                <div class="chart msc-chart">
+                    <canvas id="mscChart"></canvas>
+                </div>
+                <p>M.Sc.</p>
+                <p class="total-student">TOTAL: Student 24</p>
+                <p class="percentages">10% Retired<br>80% Studying<br>10% Graduates</p>
+                <div class="details">
+                    <div class="detail blue">
+                        <p>Total of studying</p>
+                        <p class="number">20</p>
+                    </div>
+                    <div class="detail red">
+                        <p>Total of Retired</p>
+                        <p class="number">4</p>
+                    </div>
+                    <div class="detail yellow">
+                        <p>Total of Graduate</p>
+                        <p class="number">4</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-item">
+                <div class="chart meng-chart">
+                    <canvas id="mengChart"></canvas>
+                </div>
+                <p>M.Eng.</p>
+                <p class="total-student">TOTAL: Student 122</p>
+                <p class="percentages">3% Retired<br>90% Studying<br>7% Graduates</p>
+                <div class="details">
+                    <div class="detail blue">
+                        <p>Total of studying</p>
+                        <p class="number">19</p>
+                    </div>
+                    <div class="detail red">
+                        <p>Total of Retired</p>
+                        <p class="number">3</p>
+                    </div>
+                    <div class="detail yellow">
+                        <p>Total of Graduate</p>
+                        <p class="number">3</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-item">
+                <div class="chart phd-chart">
+                    <canvas id="phdChart"></canvas>
+                </div>
+                <p>Ph.D.</p>
+                <p class="total-student">TOTAL: Student 35</p>
+                <p class="percentages">10% Retired<br>60% Studying<br>30% Graduates</p>
+                <div class="details">
+                    <div class="detail blue">
+                        <p>Total of studying</p>
+                        <p class="number">30</p>
+                    </div>
+                    <div class="detail red">
+                        <p>Total of Retired</p>
+                        <p class="number">5</p>
+                    </div>
+                    <div class="detail yellow">
+                        <p>Total of Graduate</p>
+                        <p class="number">5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/Project_FN_Trackstatus/pages/js/ds.js"></script>
+</body>
+</html>
