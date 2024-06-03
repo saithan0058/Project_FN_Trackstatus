@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Link to Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kumar+One&display=swap" rel="stylesheet">
+
+    <!-- Internal CSS for Kumar One Font and Text Centering -->
+    <style>
+        /* 1 */
+        
+        .kumar-one-font {
+            font-family: 'Kumar One', cursive;
+            color: #0054D3;
+            font-size: 64px;
+        }
+        .centered-textp {
+            flex-grow: 1;
+            display: flex;
+            margin-left: 150px;
+            justify-content: center;
+            align-items: center;
+        }
+        .centered-text {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #navbar2 {
+            background-color: #0054D3; /* Set the background color */
+        }
+
+        /* 2 */
+         /* Font and color for links */
+         .navbar2-link {
+            font-family: 'Lalezar', cursive;
+            color: white;
+            font-weight: bold;
+            font-size: 22px;
+            text-decoration: none;
+            margin-right: 20px; /* Adjust margin between links if needed */
+        }
+
+        /* 3 */
+        /* Flexbox for navbar2 links */
+        .navbar2-links {
+            flex-grow: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 4 */
+        /* Button styling */
+        .navbar2-button {
+            background-color: #14274E;
+            color: white;
+            border: none;
+            padding: 1px 15px;
+            border-radius: 12px;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            background-image: linear-gradient(60deg, #14274E 40%, transparent 60%);
+            cursor: pointer;
+        }
+
+        /* 5 */
+        /* Adjust button position */
+        .navbar2-button-container {
+            margin-left: auto;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header id="navbar" class="text-dark py-3">
+        <div id="change" class="d-flex align-items-center">
+            <!-- IT picture -->
+            <div class="mx-3">
+                <img src="/img/it.jpg" alt="" style="width: 120px; height: auto;">
+            </div>
+            <!-- Centered text -->
+            <div class="centered-textp mt-4">
+                <h1 class="kumar-one-font">GradTrack</h1>
+            </div>
+            <!-- info -->
+            <div>
+                <p>MS.ABCD EFGH</p>
+                <p>64********</p>
+                <p>M.SC.</p>
+                <a href="#" style="color: black;">More info <span>&#9660;</span></a>
+            </div>
+            <!-- profile info -->
+            <div class="mx-5">
+                <img src="/img/profile2.png" alt="" style="width: 120px; height: auto;">
+            </div>
+        </div>
+    </header>
+
+    <header id="navbar2" class="text-dark" style="background-color: #0054D3;">
+        <div id="change" class="d-flex align-items-center">
+            <!-- Centered text -->
+            <div class="centered-text ">
+                <!-- Links -->
+                <div class="navbar2-links">
+                    <a href="#" class="navbar2-link">HOME</a>
+                    <a href="#" class="navbar2-link">SEARCH</a>
+                </div>
+                <!-- Button -->
+                <div class="navbar2-button-container">
+                    <button class="navbar2-button">Log out</button>
+                </div>
+            </div>
+        </div>
+    </header>
+</body>
+</html>
+
+<!-- test -->
