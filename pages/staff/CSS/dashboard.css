@@ -1,0 +1,124 @@
+/* dashboard.css */
+
+* {
+    box-sizing: border-box;
+    
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 2rem;
+    background-color: #f4f4f4;
+}
+
+.container {
+    
+    
+}
+
+.total, .category {
+    
+    margin-bottom: 1rem;
+}
+
+.total {
+    width: 100%;
+    max-width: 80rem;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-chart, .msc-chart, .meng-chart, .phd-chart {
+    width: 300px;
+    height: 300px;
+}
+
+.total-details {
+    
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 60%;
+}
+
+.detail {
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px;
+    text-align: center;
+    flex: 1 1 200px;
+}
+
+.number {
+    font-size: 2em;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.category {
+    width: 63.5%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.category-item {
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin: 1rem;
+    text-align: center;
+    flex: 1 1 30%;
+}
+
+.chart {
+    width: 18rem;
+    height: 18rem;
+    margin: 0 auto 1rem auto;
+}
+
+.total-student {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.percentages {
+    font-size: 0.9em;
+    margin-bottom: 20px;
+}
+
+.details {
+    display: flex;
+    justify-content: space-around;
+}
+
+.detail.blue {
+    box-shadow: 1px 1px 30px rgb(172, 172, 172);
+
+    border-color: #36A2EB;
+}
+
+.detail.red {
+    box-shadow: 1px 1px 30px rgb(172, 172, 172);
+
+    border-color: #FF6384;
+}
+
+.detail.green {
+    box-shadow: 1px 1px 30px rgb(172, 172, 172);
+
+    border-color: #4CAF50;
+}
+
+.detail.yellow {
+    box-shadow: 1px 1px 30px rgb(172, 172, 172);
+
+    border-color: #FFCE56;
+}
