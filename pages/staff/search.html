@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+    href="https://fonts.googleapis.com/css2?family=Lalezar&display=swap&family=Quantico&family=Inika&display=swap"
+    rel="stylesheet"
+  />
+    <style>
+      .fonthead {
+        font-family: "Lalezar", cursive;
+        text-align: center;
+        color: #0054d3;
+        font-size: 44px;
+        margin-top: 5rem;
+      }
+
+      .detail {
+        font-family: "Inika", cursive;
+        margin-top: 1rem;
+        font-size: 18px;
+      }
+
+      .search {
+        font-family: "Quantico", cursive !important; 
+        color: #ffffff;
+        font-size: 25px;
+        margin: 0;
+        line-height: 50px;
+        white-space: nowrap;
+      }
+
+      .box-search {
+        max-width: 1000px;
+        margin: 0 auto;
+        background-color: #3988ff;
+        border-bottom: 2px solid black;
+        display: flex;
+        height: 50px;
+        overflow: hidden;
+      }
+
+      .box-detail {
+        max-width: 1000px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 1rem;
+        margin-bottom: 5%;
+      }
+
+      .d-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0 1rem;
+      }
+
+      .d-flex p {
+        margin-right: 1rem;
+        flex: 1;
+      }
+
+      #education, #status, #namestu, #namead {
+        width: 40%;
+        height: 30px;
+        margin-right: 20%;
+        border: none;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+        font-family: "Inika", cursive;
+        font-size: 16px;
+      }
+
+      .btn-container {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 1rem 1rem 0;
+      }
+
+      .btnn {
+        padding: 0.5rem 1rem;
+        font-size: 16px;
+        font-family: "Quantico", cursive !important;
+        border: none;
+        border-radius: 20px;
+        background-color: #ffc107 !important; 
+        color: #000 !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        font-weight: bold !important;
+      }
+
+      .btnn:hover {
+        background-color: #3988ff !important; 
+        color: #ffffff !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="navbar-placeholder"></div>
+    <script src="/loadlayout1"></script>
+
+    <div>
+      <h1 class="fonthead">Staff</h1>
+    </div>
+
+    <!-- search -->
+    <div class="box-search">
+      <p class="search mx-5">Search</p>
+    </div>
+
+    <!-- detail -->
+    <div class="box-detail">
+      <div class="detail mx-5">
+        <!-- 1 choose -->
+        <div class="d-flex">
+          <p>Education</p>
+          <select id="education">
+            <option value="volvo">Volvo</option>
+            <option value="saab">Saab</option>
+            <option value="opel">Opel</option>
+            <option value="audi">Audi</option>
+          </select>
+        </div>
+        
+        <!-- name -->
+        <div class="d-flex">
+            <p>Name or code (student)</p>
+            <input type="text" id="namestu" value="">
+          </div>
+          <!-- name ad -->
+          <div class="d-flex">
+            <p>Name or code (advisor)</p>
+            <input type="text" id="namead" value="">
+          </div>
+        
+        <!-- status -->
+        <div class="d-flex">
+          <p>Status</p>
+          <select id="status">
+            <option value="volvo">Volvo</option>
+            <option value="saab">Saab</option>
+            <option value="opel">Opel</option>
+            <option value="audi">Audi</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-container">
+        <button class="btnn">Search</button>
+      </div>
+    </div>
+  </body>
+</html>
