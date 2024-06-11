@@ -12,88 +12,119 @@ app.use("/layouts", express.static(path.join(__dirname, "/layouts")));
 app.use("/jason", express.static(path.join(__dirname, "/jason")));
 
 // Root
-app.get("/", function(req, res) {
-    res.sendFile(path.join(__dirname, "/pages/login/login.html"));
+app.get("/", function (req, res) {
+  res.sendFile(path.join(__dirname, "/pages/login/login.html"));
 });
 
 // เพิ่มหน้าเพจต่างๆ
-app.get("/search", function(req, res) {
-    res.sendFile(path.join(__dirname, "/pages/staff/search.html"));
+app.get("/search", function (req, res) {
+  res.sendFile(path.join(__dirname, "/pages/staff/search.html"));
 });
 
-app.get("/listadvisor", function(req, res) {
-    res.sendFile(path.join(__dirname, "/pages/advisor/listadvisor.html"));
+app.get("/listadvisor", function (req, res) {
+  res.sendFile(path.join(__dirname, "/pages/advisor/listadvisor.html"));
 });
 
-app.get("/liststaff", function(req, res) {
-    res.sendFile(path.join(__dirname, "/pages/staff/list.html"));
+app.get("/liststaff", function (req, res) {
+  res.sendFile(path.join(__dirname, "/pages/staff/list.html"));
 });
 
-app.get("/profile", function(req, res) {
-    res.sendFile(path.join(__dirname, "/pages/student/profile.html"));
+app.get("/profile", function (req, res) {
+  res.sendFile(path.join(__dirname, "/pages/student/profile.html"));
 });
 
-app.get("/dashboard", function(req, res) {
-    res.sendFile(path.join(__dirname, "/pages/staff/dashboard.html"));
+app.get("/dashboard", function (req, res) {
+  res.sendFile(path.join(__dirname, "/pages/staff/dashboard.html"));
 });
 
-app.get("/timeline", function(req, res) {
-    res.sendFile(path.join(__dirname, "/pages/staff/timeline.html"));
+app.get("/timeline", function (req, res) {
+  res.sendFile(path.join(__dirname, "/pages/staff/timeline.html"));
 });
 
-app.get("/layout1", function(req, res) {
-    res.sendFile(path.join(__dirname, "/layouts/layout1.html"));
+app.get("/layout1", function (req, res) {
+  res.sendFile(path.join(__dirname, "/layouts/layout1.html"));
 });
 
-app.get("/layout2", function(req, res) {
-    res.sendFile(path.join(__dirname, "/layouts/layoutprofile.html"));
+app.get("/layout2", function (req, res) {
+  res.sendFile(path.join(__dirname, "/layouts/layoutprofile.html"));
 });
 
-app.get("/loadlayout1", function(req, res) {
-    res.sendFile(path.join(__dirname, "/jason/loadlayout1.js"));
+app.get("/loadlayout1", function (req, res) {
+  res.sendFile(path.join(__dirname, "/jason/loadlayout1.js"));
 });
 
-app.get("/loadlayout2", function(req, res) {
-    res.sendFile(path.join(__dirname, "/jason/loadlayoutprofile.js"));
+app.get("/loadlayout2", function (req, res) {
+  res.sendFile(path.join(__dirname, "/jason/loadlayoutprofile.js"));
 });
 
 // API for getting user and research data
-app.get('/getuser/:id', async function (req, res) {
-    try {
-        const connection = await mysql.createConnection(dbConfig);
-        
-        // Get user data
-        const [userResults] = await connection.execute(
-            'SELECT * FROM users_data_table WHERE USERNAME = ?',
-            [req.params.id]
-        );
+app.get("/getuser/:id", async function (req, res) {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
 
-        if (userResults.length === 0) {
-            res.json({ status: 'error', message: 'User not found' });
-            return;
-        }
+    // Get user data
+    const [userResults] = await connection.execute(
+      "SELECT * FROM users_data_table WHERE USERNAME = ?",
+      [req.params.id]
+    );
 
-        const user = userResults[0];
-        const userId = user.ID;
-
-        // Get research data
-        const [researchResults] = await connection.execute(
-            'SELECT STATUS FROM research_data_table WHERE USER_ID = ?',
-            [userId]
-        );
-
-        const researchStatus = researchResults.length > 0 ? researchResults[0].STATUS : null;
-
-        await connection.end();
-        
-        res.json({ status: 'success', user: user, researchStatus: researchStatus });
-    } catch (err) {
-        console.error('Database error:', err);
-        res.json({ status: 'error', message: 'Database server error', error: err.message });
+    if (userResults.length === 0) {
+      res.json({ status: "error", message: "User not found" });
+      return;
     }
+
+    const user = userResults[0];
+    const userId = user.ID;
+
+    // Get research data
+    const [researchResults] = await connection.execute(
+      "SELECT STATUS FROM research_data_table WHERE USER_ID = ?",
+      [userId]
+    );
+
+    const researchStatus = researchResults.length > 0 ? researchResults[0].STATUS : null;
+
+    await connection.end();
+
+    res.json({ status: "success", user: user, researchStatus: researchStatus });
+  } catch (err) {
+    console.error("Database error:", err);
+    res.json({ status: "error", message: "Database server error", error: err.message });
+  }
+});
+
+// API for getting statistics data for specific programs
+app.get("/statistics", async function (req, res) {
+  try {
+    const programIds = [487111020, 487111000, 595170203];
+    const connection = await mysql.createConnection(dbConfig);
+
+    // Create a query string with placeholders for each program ID
+    const placeholders = programIds.map(() => '?').join(',');
+    const query = `
+      SELECT PROGRAM, SUM(TOTAL) AS TOTAL, SUM(CANDIDATE) AS CANDIDATE, SUM(GRADUATE) AS GRADUATE, SUM(RETRY) AS RETRY, SUM(NORMAL) AS NORMAL
+      FROM statistic_report_data_table
+      WHERE PROGRAM IN (${placeholders})
+      GROUP BY PROGRAM
+    `;
+
+    const [results] = await connection.execute(query, programIds);
+
+    await connection.end();
+
+    if (results.length === 0) {
+      res.json({ status: "error", message: "Programs not found" });
+      return;
+    }
+
+    res.json({ status: "success", data: results });
+  } catch (err) {
+    console.error("Database error:", err);
+    res.json({ status: "error", message: "Database server error", error: err.message });
+  }
 });
 
 const port = 3000;
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
