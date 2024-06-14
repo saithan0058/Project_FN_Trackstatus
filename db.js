@@ -1,20 +1,20 @@
-const mysql = require('mysql')
+const mysql = require('mysql2/promise');
 
-// MySQL connection
-const dbConnection = mysql.createConnection({
+// MySQL connection configuration
+const dbConfig = {
     host: 'localhost',
     user: 'root',
     password: '',
     database: 'gmis',
     port: '3306'
-})
+};
 
-dbConnection.connect((err) => {
-    if (err) {
-        console.log('Error Connection to MySQL database = ', err);
-        return;
-    }
-    console.log('MySQL successfully connected!');
-})
-
-module.exports = dbConnection;
+// dbConfig.connect((error) => {
+//   if (error) {
+//     console.log(error, "db connect erro")
+//   } else {
+//     console.log("connect..")
+//   }
+// })
+// Export the database configuration
+module.exports = dbConfig;

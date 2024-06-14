@@ -1,15 +1,508 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
-    <div id="navbar-placeholder"></div>
-    <script src="/jason/loadlayout1.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Link to Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kumar+One&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <style>
+    .kumar-one-font {
+      font-family: "Kumar One", cursive;
+      color: #0054d3;
+      font-size: 64px;
+    }
+    .centered-textp {
+      flex-grow: 1;
+      display: flex;
+      margin-right: 170px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hh {
+      border-top: 5px solid #0054d3;
+      background-color: white;
+    }
+
+    .body {
+      background-color: #0054d3;
+    }
+
+    .advisor,
+    .committee,
+    .student {
+      font-family: "Lalezar", cursive;
+      font-weight: bold;
+    }
+
+    .committee {
+      text-align: end;
+    }
+
+    .detail {
+      background-color: white;
+      margin-top: 100px;
+    }
+    /* click me */
+    .p {
+      font-size: 16px;
+    }
+
+    .side2 {
+      text-align: end;
+    }
+
+    .imgedit {
+      position: absolute;
+      clip-path: circle(50%);
+      width: 300px;
+    }
+    .image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 180px;
+    }
+
+    .studentdetail {
+      box-shadow: 4px 4px 8px rgba(1, 1, 1, 0.5);
+      width: 90%;
+      justify-content: center;
+      align-items: center;
+    }
+    .studentdetail2 {
+      width: 90%;
+      justify-content: center;
+      align-items: center;
+    }
+    .researchdetail {
+      margin-top: 50px;
+      background-color: white;
+    }
+
+    .publication {
+      margin-top: 50px;
+      background-color: white;
+    }
+    .publication2 {
+      width: 90%;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .ethics {
+      margin-top: 50px;
+      background-color: white;
+    }
+    .ethics2 {
+      width: 90%;
+      justify-content: center;
+      align-items: center;
+    }
+    .exam {
+      margin-top: 50px;
+      background-color: white;
+    }
+    .exam2 {
+      width: 90%;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .space {
+      font-weight: bold;
+      justify-content: space-between;
+    }
+
+    .status {
+      color: #44b400;
+    }
+
+    .dot {
+      position: absolute;
+      margin-left: 550px;
+    }
+
+    .order {
+      font-weight: bold;
+      width: 10px;
+      background-color: rgb(0, 0, 0);
+      color: white;
+    }
+
+    .order2 {
+      font-weight: bold;
+      width: 10px;
+      background-color: rgb(0, 0, 0);
+      color: white;
+      margin-left: 620px;
+    }
+  </style>
+  <body class="body">
+    <!-- head -->
+    <div class="d-flex hh">
+      <img class="mt-4 mx-5 mb-4" src="/public/img/it.jpg" alt="" style="width: 120px; height: auto" />
+      <div class="centered-textp mt-4">
+        <h1 class="kumar-one-font">Profile</h1>
+      </div>
+    </div>
+  
+    <!-- detail -->
+    <div class="detail container">
+      <!-- img profile -->
+      <div class="image-container">
+        <img id="profileImage" src="/public/img/profileimg.jpg" alt="Profile Image" class="imgedit" />
+      </div>
+  
+      <!-- commitee adviser -->
+      <div class="d-flex nameteacher p-3">
+        <div class="col-6">
+          <!-- Adviser info -->
+          <div class="colorr">
+            <h1 class="advisor">ADVISOR</h1>
+            <div id="advisorContainer"></div> <!-- Adviser data will be inserted here -->
+          </div>
+        </div>
+        <div class="col-6 side2">
+          <!-- Committee info -->
+          <h1 class="committee">COMMITTEE</h1>
+          <div id="committeeContainer"></div> <!-- Committee data will be inserted here -->
+        </div>
+      </div>
+  
+      <!-- student detail -->
+      <div class="studentdetail container">
+        <h1 class="text-center student">STUDENT</h1>
+        <div class="p-5" id="studentDetails"></div> <!-- Student data will be inserted here -->
+      </div>
+  
+      <!-- research box -->
+      <div class="researchdetail container">
+        <h1 class="text-center student">Research topic / Thesis topic / Dissertation topic</h1>
+        <div class="studentdetail2 container">
+          <div class="d-flex space">
+            <p>Research Title:</p>
+            <p class="dot">:</p>
+            <p id="researchTitle"></p>
+          </div>
+          <br />
+        </div>
+      </div>
+  
+      <!-- Publication box -->
+      <div class="publication container">
+        <h1 class="text-center student">Publication</h1>
+        <div id="publicationContainer"></div> <!-- Publications will be inserted here -->
+      </div>
+  
+      <!-- research ethics -->
+      <div class="ethics container">
+        <h1 class="text-center student">Research ethics training</h1>
+        <div id="ethicsContainer"></div> <!-- Ethics data will be inserted here -->
+      </div>
+  
+      <!-- english exam -->
+      <div class="exam container">
+        <h1 class="text-center student">English Exam</h1>
+        <div id="examContainer"></div> <!-- Exam data will be inserted here -->
+      </div>
+    </div>
+  
+    <!-- JavaScript to fetch and display data -->
+   <!-- JavaScript to fetch and display data -->
+<script>
+  async function fetchData() {
+    try {
+      // Fetch data from the endpoint
+      const response = await fetch("/dataprofile/12/1");
+      const data = await response.json();
+
+ // Display adviser data
+const advisorContainer = document.getElementById('advisorContainer');
+const uniqueAdvisorData = {}; // Object to store unique advisor data
+
+// Loop through adviser data
+data.adviserData.forEach((advisor, index) => {
+  // Find the inner adviser data based on the advisor ID
+  const innerAdvisors = data.inneradviserData.filter(inner => inner.ADVISOR_ID === advisor.ADVISOR_ID);
+
+  // Ensure there are inner advisers
+  if (innerAdvisors.length > 0) {
+    let positionText = '';
+    // Determine position text based on ADVISER_LEVEL
+    switch (advisor.ADVISER_LEVEL) {
+      case 1:
+        positionText = 'Co-adviser';
+        break;
+      case 2:
+        positionText = 'Adviser';
+        break;
+      case 3:
+        positionText = 'Committee';
+        break;
+      case 4:
+        positionText = 'Committee chairman';
+        break;
+      default:
+        positionText = '';
+        break;
+    }
+
+    // Iterate through each inner advisor
+    innerAdvisors.forEach((innerAdvisor, innerIndex) => {
+      // Find committee data matching the USER_ID of inner advisor
+      const committeeData = data.committeeData.find(committee => committee.USER_ID === innerAdvisor.USER_ID);
+
+      // Collect and store unique adviser data
+      const key = `${advisor.NAME_EN}_${innerIndex}`;
+      if (!uniqueAdvisorData[key]) {
+        uniqueAdvisorData[key] = {
+          NAME_EN: advisor.NAME_EN,
+          EMAIL: innerAdvisor.EMAIL,
+          PHONE: innerAdvisor.PHONE,
+          POSITION: positionText
+        };
+      }
+    });
+  }
+});
+
+// Create and display HTML for advisors
+Object.values(uniqueAdvisorData).forEach((advisor, index) => {
+  const advisorHTML = `
+    <div class="order">${index + 1}</div>
+    <p class="p">${advisor.NAME_EN}</p>
+    <p class="p">Email: ${advisor.EMAIL}</p>
+    <p class="p">Phone: ${advisor.PHONE}</p>
+    <p class="p">Position: ${advisor.POSITION}</p>
+  `;
+  advisorContainer.insertAdjacentHTML('beforeend', advisorHTML);
+});
+
+
+
+
+
+// Display committee data
+const committeeContainer = document.getElementById('committeeContainer');
+const uniqueCommitteeData = {}; // Object to store unique committee data
+
+data.committeeData.forEach((committee, index) => {
+  const innerCommittees = data.innercommitteeData.find(inner => inner.COMMITTEE_ID === committee.COMMITTEE_ID);
+  if (innerCommittees) {
+    let positionText = '';
+    // กำหนดข้อความตามค่า COMMITTEE_LEVEL
+    switch (committee.COMMITTEE_LEVEL) {
+      case 1:
+        positionText = 'Co-adviser';
+        break;
+      case 2:
+        positionText = 'Adviser';
+        break;
+      case 3:
+        positionText = 'Committee';
+        break;
+      case 4:
+        positionText = 'Committee chairman';
+        break;
+      default:
+        positionText = '';
+        break;
+    }
+
+    // เก็บข้อมูลของคณะกรรมการที่มี NAME_EN ที่ซ้ำกันไว้ใน uniqueCommitteeData
+    if (!uniqueCommitteeData[committee.NAME_EN]) {
+      uniqueCommitteeData[committee.NAME_EN] = {
+        NAME_EN: committee.NAME_EN,
+        positions: [positionText],
+        emails: [innerCommittees.EMAIL],
+        phones: [innerCommittees.PHONE]
+      };
+    } else {
+      uniqueCommitteeData[committee.NAME_EN].positions.push(positionText);
+      uniqueCommitteeData[committee.NAME_EN].emails.push(innerCommittees.EMAIL);
+      uniqueCommitteeData[committee.NAME_EN].phones.push(innerCommittees.PHONE);
+    }
+  }
+});
+
+// สร้าง HTML และแสดงผล
+Object.values(uniqueCommitteeData).forEach((committee, index) => {
+  const positionText = committee.positions.join(', '); // รวม positionText ด้วย comma
+  const emailsText = committee.emails.join(', ');
+  const phonesText = committee.phones.join(', ');
+
+  const committeeHTML = `
+    <div class="order2">${index + 1}</div>
+    <p class="p">${committee.NAME_EN}</p>
+    <p class="p">Email: ${emailsText}</p>
+    <p class="p">Phone: ${phonesText}</p>
+    <p class="p">Position: ${positionText}</p>
+  `;
+  committeeContainer.insertAdjacentHTML('beforeend', committeeHTML);
+});
+
+
+
+      // Display student data
+      const studentDetails = document.getElementById('studentDetails');
+      studentDetails.innerHTML = `
+        <div class="d-flex space">
+          <p>Firstname - Lastname</p>
+          <p class="dot">:</p>
+          <p>${data.studentData.NAME_EN}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Student ID</p>
+          <p class="dot">:</p>
+          <p>${data.studentData.USERNAME}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Role</p>
+          <p class="dot">:</p>
+          <p>${data.studentData.ROLE_ID}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Major</p>
+          <p class="dot">:</p>
+          <p>ยังไม่มี</p>
+        </div>
+        <div class="d-flex space">
+          <p>Email</p>
+          <p class="dot">:</p>
+          <p>${data.studentData.EMAIL}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Phone</p>
+          <p class="dot">:</p>
+          <p>${data.studentData.MOBILE}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Program</p>
+          <p class="dot">:</p>
+          <p>ยังไม่มี</p>
+        </div>
+        <div class="d-flex space">
+          <p>School</p>
+          <p class="dot">:</p>
+          <p>ยังไม่มี</p>
+        </div>
+        <div class="d-flex space">
+          <p>Level of education</p>
+          <p class="dot">:</p>
+          <p>ยังไม่มี</p>
+        </div>
+        <div class="d-flex space">
+          <p>Study plan</p>
+          <p class="dot">:</p>
+          <p>${data.studentData.PLAN_VERSION}</p>
+        </div>
+        <div class="d-flex space">
+          <p>GPAX</p>
+          <p class="dot">:</p>
+          <p>ยังไม่มี</p>
+        </div>
+        <div class="d-flex space">
+          <p>Start Semester</p>
+          <p class="dot">:</p>
+          <p>${data.studentData.START_TERM}/${data.studentData.START_YEAR}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Status of education</p>
+          <p class="dot">:</p>
+          <p class="status">ยังไม่มี</p>
+        </div>
+      `;
+
+      // Display research title
+      document.getElementById('researchTitle').textContent = data.researchData.TITLE_EN;
+
+      // Display publication data
+      const publicationContainer = document.getElementById('publicationContainer');
+      data.researchPublishingData.forEach(pub => {
+        const pubHTML = `
+          <div class="d-flex space">
+            <p>Publication No</p>
+            <p class="dot">:</p>
+            <p>${pub.PUBLISHING_NO}</p>
+          </div>
+        `;
+        publicationContainer.insertAdjacentHTML('beforeend', pubHTML);
+      });
+
+      // Display ethics data
+      const ethicsContainer = document.getElementById('ethicsContainer');
+      ethicsContainer.innerHTML = `
+        <div class="d-flex space">
+          <p>Training status</p>
+          <p class="dot">:</p>
+          <p class="status">${data.studentData.ETHICS_TRAIN_STATUS}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Research ethics status</p>
+          <p class="dot">:</p>
+          <p class="status">${data.studentData.ETHICS_RESEARCH_STATUS}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Training date</p>
+          <p class="dot">:</p>
+          <p>${data.studentData.ETHICS_TRAIN_DATE}</p>
+        </div>
+      `;
+
+      // Display English exam data
+      const examContainer = document.getElementById('examContainer');
+      examContainer.innerHTML = `
+        <div class="d-flex space">
+          <p>English Exam Type</p>
+          <p class="dot">:</p>
+          <p>${data.englishExamData.EXAM_TYPE}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Taken Date</p>
+          <p class="dot">:</p>
+          <p>${data.englishExamData.TAKEN_DATE}</p>
+        </div>
+        <div class="d-flex space">
+          <p>More Detail</p>
+          <p class="dot">:</p>
+          <p>${data.englishExamData.MORE_DETAIL}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Score</p>
+          <p class="dot">:</p>
+          <p>${data.englishExamData.SCORE}</p>
+        </div>
+        <div class="d-flex space">
+          <p>Result submit term</p>
+          <p class="dot">:</p>
+          <p>${data.englishExamData.RESULT_SUBMIT_TERM}</p>
+        </div>
+      `;
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }
+
+  // Call the fetchData function to load data on page load
+  window.onload = fetchData;
+</script>
 </body>
 </html>
-
-<!-- test kkkkk-->

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Statistics</title>
+    <link rel="stylesheet" href="/pages/CSS/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+    <script src="/loadlayout1"></script>
+    <div class="container">
+        <div class="total">
+            <div class="chart total-chart">
+                <canvas id="totalChart"></canvas>
+            </div>
+            <div class="total-details">
+                <div class="detail blue">
+                    <p>Total of student</p>
+                    <p id="totalStudent" class="number"></p>
+                </div>
+                <div class="detail red">
+                    <p>Total of Retire</p>
+                    <p id="totalRetire" class="number"></p>
+                </div>
+                <div class="detail green">
+                    <p>Total of Studying</p>
+                    <p id="totalStudying" class="number"></p>
+                </div>
+                <div class="detail yellow">
+                    <p>Total of Graduate</p>
+                    <p id="totalGraduate" class="number"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <div class="category-item">
+                <div class="chart msc-chart">
+                    <canvas id="mscChart"></canvas>
+                </div>
+                <p>M.Sc.</p>
+                <p class="total-student">TOTAL: Student <span id="mscTotal"></span></p>
+                <p class="percentages">
+                    <span id="mscRetiredPerc">0%</span> Retired<br>
+                    <span id="mscStudyingPerc">0%</span> Studying<br>
+                    <span id="mscGraduatePerc">0%</span> Graduates
+                </p>
+                <div class="details">
+                    <div class="detail blue">
+                        <p>Total of studying</p>
+                        <p id="mscStudying" class="number"></p>
+                    </div>
+                    <div class="detail red">
+                        <p>Total of Retired</p>
+                        <p id="mscRetired" class="number"></p>
+                    </div>
+                    <div class="detail yellow">
+                        <p>Total of Graduate</p>
+                        <p id="mscGraduate" class="number"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-item">
+                <div class="chart meng-chart">
+                    <canvas id="mengChart"></canvas>
+                </div>
+                <p>M.Eng.</p>
+                <p class="total-student">TOTAL: Student <span id="mengTotal"></span></p>
+                <p class="percentages">
+                    <span id="mengRetiredPerc">0%</span> Retired<br>
+                    <span id="mengStudyingPerc">0%</span> Studying<br>
+                    <span id="mengGraduatePerc">0%</span> Graduates
+                </p>
+                <div class="details">
+                    <div class="detail blue">
+                        <p>Total of studying</p>
+                        <p id="mengStudying" class="number"></p>
+                    </div>
+                    <div class="detail red">
+                        <p>Total of Retired</p>
+                        <p id="mengRetired" class="number"></p>
+                    </div>
+                    <div class="detail yellow">
+                        <p>Total of Graduate</p>
+                        <p id="mengGraduate" class="number"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-item">
+                <div class="chart phd-chart">
+                    <canvas id="phdChart"></canvas>
+                </div>
+                <p>Ph.D.</p>
+                <p class="total-student">TOTAL: Student <span id="phdTotal"></span></p>
+                <p class="percentages">
+                    <span id="phdRetiredPerc">0%</span> Retired<br>
+                    <span id="phdStudyingPerc">0%</span> Studying<br>
+                    <span id="phdGraduatePerc">0%</span> Graduates
+                </p>
+                <div class="details">
+                    <div class="detail blue">
+                        <p>Total of studying</p>
+                        <p id="phdStudying" class="number"></p>
+                    </div>
+                    <div class="detail red">
+                        <p>Total of Retired</p>
+                        <p id="phdRetired" class="number"></p>
+                    </div>
+                    <div class="detail yellow">
+                        <p>Total of Graduate</p>
+                        <p id="phdGraduate" class="number"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const response = await fetch('/statistics');
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                const stats = data.data;
+
+                let totalStudent = 0;
+                let totalRetire = 0;
+                let totalStudying = 0;
+                let totalGraduate = 0;
+
+                // Function to update individual program stats
+                function updateProgramStats(program, prefix) {
+                    const programStats = stats.find(stat => stat.PROGRAM === program);
+
+                    if (programStats) {
+                        document.getElementById(`${prefix}Studying`).textContent = programStats.NORMAL;
+                        document.getElementById(`${prefix}Retired`).textContent = programStats.CANDIDATE;
+                        document.getElementById(`${prefix}Graduate`).textContent = programStats.GRADUATE;
+                        document.getElementById(`${prefix}Total`).textContent = programStats.TOTAL;
+
+                        const studyingPerc = (programStats.NORMAL / programStats.TOTAL) * 100;
+                        const retiredPerc = (programStats.CANDIDATE / programStats.TOTAL) * 100;
+                        const graduatePerc = (programStats.GRADUATE / programStats.TOTAL) * 100;
+
+                        document.getElementById(`${prefix}StudyingPerc`).textContent = `${studyingPerc.toFixed(2)}%`;
+                        document.getElementById(`${prefix}RetiredPerc`).textContent = `${retiredPerc.toFixed(2)}%`;
+                        document.getElementById(`${prefix}GraduatePerc`).textContent = `${graduatePerc.toFixed(2)}%`;
+
+                        // เพิ่มค่าเข้าผลรวมทั้งหมด
+                        totalStudent += parseInt(programStats.TOTAL);
+                        totalRetire += parseInt(programStats.CANDIDATE);
+                        totalStudying += parseInt(programStats.NORMAL);
+                        totalGraduate += parseInt(programStats.GRADUATE);
+                    }
+                }
+
+                updateProgramStats(487111020, 'msc');
+                updateProgramStats(487111000, 'meng');
+                updateProgramStats(595170203, 'phd');
+
+                // อัพเดทผลรวมทั้งหมดในหน้าเว็บ
+                document.getElementById('totalStudent').textContent = totalStudent;
+                document.getElementById('totalRetire').textContent = totalRetire;
+                document.getElementById('totalStudying').textContent = totalStudying;
+                document.getElementById('totalGraduate').textContent = totalGraduate;
+
+                // Initialize total chart
+                const totalCtx = document.getElementById('totalChart').getContext('2d');
+                new Chart(totalCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Retired', 'Studying', 'Graduates'],
+                        datasets: [{
+                            data: [totalRetire, totalStudying, totalGraduate],
+                            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+
+                // Initialize individual program charts
+                function initChart(ctxId, programStats) {
+                    const ctx = document.getElementById(ctxId).getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Retired', 'Studying', 'Graduates'],
+                            datasets: [{
+                                data: [programStats.CANDIDATE, programStats.NORMAL, programStats.GRADUATE],
+                                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+
+                initChart('mscChart', stats.find(stat => stat.PROGRAM === 487111020));
+                initChart('mengChart', stats.find(stat => stat.PROGRAM === 487111000));
+                initChart('phdChart', stats.find(stat => stat.PROGRAM === 595170203));
+            } else {
+                console.error('Failed to load statistics:', data.message);
+            }
+        });
+    </script>
+</body>
+</html>
