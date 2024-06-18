@@ -127,13 +127,17 @@ app.get("/timeline", function (req, res) {
   res.sendFile(path.join(__dirname, "/pages/staff/timeline.html"));
 });
 
+
+
+
+
 app.get("/getuser/:id", async function (req, res) {
   try {
     const connection = await mysql.createConnection(dbConfig);
 
     // Get user data
     const [userResults] = await connection.execute(
-      "SELECT * FROM users_data_table WHERE USERNAME = ?",
+      "SELECT * FROM users_data_table WHERE ID = ?",
       [req.params.id]
     );
 
@@ -145,7 +149,7 @@ app.get("/getuser/:id", async function (req, res) {
     const user = userResults[0];
     const userId = user.ID;
 
-    // Get research data
+    // Get research data by USER_ID
     const [researchResults] = await connection.execute(
       "SELECT STATUS FROM research_data_table WHERE USER_ID = ?",
       [userId]
@@ -154,9 +158,17 @@ app.get("/getuser/:id", async function (req, res) {
     const researchStatus =
       researchResults.length > 0 ? researchResults[0].STATUS : null;
 
+    // Get student data
+    const [studentResults] = await connection.execute(
+      "SELECT START_YEAR, FINISH_YEAR, ETHICS_TRAIN_DATE, ET_DATE FROM student_data_table WHERE USER_ID = ?",
+      [userId]
+    );
+
+    const studentData = studentResults[0];
+
     await connection.end();
 
-    res.json({ status: "success", user: user, researchStatus: researchStatus });
+    res.json({ status: "success", user: user, researchStatus: researchStatus, studentData: studentData });
   } catch (err) {
     console.error("Database error:", err);
     res.json({
@@ -166,6 +178,11 @@ app.get("/getuser/:id", async function (req, res) {
     });
   }
 });
+
+
+
+
+
 
 // API for getting statistics data for specific programs
 app.get("/statistics", async function (req, res) {

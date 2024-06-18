@@ -9,7 +9,7 @@
 <body>
     <div id="navbar-placeholder"></div>
     <script src="/loadlayout1"></script>
-    <div >
+    <div>
         <div class="header">
             <h1>Timeline Guide to Graduate</h1>
             <div class="buttons">
@@ -39,10 +39,11 @@
             <span class="status retried">Retried</span>
         </div>
         <div class="precaution-list">
-            <div class="precaution safe">1. Academic year</div>
-            <div class="precaution safe">2. Qualifying exam</div>
-            <div class="precaution warning">3. Proposal test</div>
-            <div class="precaution safe">4. English proficiency score</div>
+            <!-- Precaution items will be inserted here by JavaScript -->
+            <div class="precaution" id="academic-year-status">1. Academic year</div>
+            <div class="precaution" id="qualifying-exam-status">2. Qualifying exam</div>
+            <div class="precaution" id="proposal-test-status">3. Proposal test</div>
+            <div class="precaution" id="english-proficiency-status">4. English proficiency score</div>
             <div class="precaution safe">5. Take a leave</div>
             <div class="precaution safe">6. GPAX > 3.00</div>
             <div class="precaution warning">7. Get "U" 2 times</div>
@@ -54,10 +55,10 @@
     <script>
         async function fetchUserData() {
             try {
-                const response = await fetch('/getuser/5551701256');
+                const response = await fetch('/getuser/678'); // ใช้ ID แทน USERNAME
                 const data = await response.json();
                 if (data.status === 'success') {
-                    populateTable(data.user, data.researchStatus);
+                    populateTable(data.user, data.researchStatus, data.studentData);
                 } else {
                     console.error(data.message);
                 }
@@ -66,9 +67,46 @@
             }
         }
 
-        function populateTable(user, researchStatus) {
+        function populateTable(user, researchStatus, studentData) {
             const statusBits = getStatusBits(user.STATUS);
             const timelineBody = document.getElementById('timeline-body');
+            
+            // คำนวณสถานะสีของ "Academic year"
+            const startYear = parseInt(studentData.START_YEAR, 10);
+            const finishYear = studentData.FINISH_YEAR ? parseInt(studentData.FINISH_YEAR, 10) : null;
+            const currentYear = new Date().getFullYear();
+            let academicStatus = 'safe';
+            
+            if (finishYear) {
+                academicStatus = 'safe';
+            } else if (currentYear - startYear >= 2) {
+                academicStatus = 'retried';
+            } else if (currentYear - startYear === 1) {
+                academicStatus = 'warning';
+            }
+
+            // คำนวณสถานะสีของ "Qualifying exam"
+            const ethicsTrainDate = studentData.ETHICS_TRAIN_DATE;
+            let qualifyingExamStatus = 'warning';
+            
+            if (ethicsTrainDate && ethicsTrainDate.trim()) {
+                qualifyingExamStatus = 'safe';
+            }
+
+            // คำนวณสถานะสีของ "Proposal test"
+            let proposalTestStatus = 'warning';
+            if (researchStatus >= 3) {
+                proposalTestStatus = 'safe';
+            }
+
+            // คำนวณสถานะสีของ "English proficiency score"
+            const etDate = studentData.ET_DATE;
+            let englishProficiencyStatus = 'warning';
+            
+            if (etDate && etDate.trim()) {
+                englishProficiencyStatus = 'safe';
+            }
+
             timelineBody.innerHTML = `
                 <tr>
                     <td>1 Research ethics training</td>
@@ -113,6 +151,22 @@
                     <td><span class="status ${researchStatus > 7 ? 'pass' : 'waiting'}">${researchStatus > 7 ? 'PASS' : 'WAITING'}</span></td>
                 </tr>
             `;
+
+            // เพิ่มส่วนที่เกี่ยวข้องกับ "Academic year" ลงในหน้าตาราง
+            const academicYearDiv = document.getElementById('academic-year-status');
+            academicYearDiv.className = `precaution ${academicStatus}`;
+
+            // เพิ่มส่วนที่เกี่ยวข้องกับ "Qualifying exam" ลงในหน้าตาราง
+            const qualifyingExamDiv = document.getElementById('qualifying-exam-status');
+            qualifyingExamDiv.className = `precaution ${qualifyingExamStatus}`;
+
+            // เพิ่มส่วนที่เกี่ยวข้องกับ "Proposal test" ลงในหน้าตาราง
+            const proposalTestDiv = document.getElementById('proposal-test-status');
+            proposalTestDiv.className = `precaution ${proposalTestStatus}`;
+
+            // เพิ่มส่วนที่เกี่ยวข้องกับ "English proficiency score" ลงในหน้าตาราง
+            const englishProficiencyDiv = document.getElementById('english-proficiency-status');
+            englishProficiencyDiv.className = `precaution ${englishProficiencyStatus}`;
         }
 
         function getStatusBits(status) {
