@@ -133,51 +133,70 @@ app.get("/timeline", function (req, res) {
 
 app.get("/getuser/:id", async function (req, res) {
   try {
-    const connection = await mysql.createConnection(dbConfig);
+      const connection = await mysql.createConnection(dbConfig);
 
-    // Get user data
-    const [userResults] = await connection.execute(
-      "SELECT * FROM users_data_table WHERE ID = ?",
-      [req.params.id]
-    );
+      // Get user data
+      const [userResults] = await connection.execute(
+          "SELECT * FROM users_data_table WHERE ID = ?",
+          [req.params.id]
+      );
 
-    if (userResults.length === 0) {
-      res.json({ status: "error", message: "User not found" });
-      return;
-    }
+      if (userResults.length === 0) {
+          res.json({ status: "error", message: "User not found" });
+          return;
+      }
 
-    const user = userResults[0];
-    const userId = user.ID;
+      const user = userResults[0];
+      const userId = user.ID;
 
-    // Get research data by USER_ID
-    const [researchResults] = await connection.execute(
-      "SELECT STATUS FROM research_data_table WHERE USER_ID = ?",
-      [userId]
-    );
+      // Get research data by USER_ID
+      const [researchResults] = await connection.execute(
+          "SELECT STATUS FROM research_data_table WHERE USER_ID = ?",
+          [userId]
+      );
 
-    const researchStatus =
-      researchResults.length > 0 ? researchResults[0].STATUS : null;
+      const researchStatus =
+          researchResults.length > 0 ? researchResults[0].STATUS : null;
 
-    // Get student data
-    const [studentResults] = await connection.execute(
-      "SELECT START_YEAR, FINISH_YEAR, ETHICS_TRAIN_DATE, ET_DATE FROM student_data_table WHERE USER_ID = ?",
-      [userId]
-    );
+      // Get student data
+      const [studentResults] = await connection.execute(
+          "SELECT START_YEAR, FINISH_YEAR, ETHICS_TRAIN_DATE, ET_DATE FROM student_data_table WHERE USER_ID = ?",
+          [userId]
+      );
 
-    const studentData = studentResults[0];
+      const studentData = studentResults[0];
 
-    await connection.end();
+      // Get status ethic date
+      const [statusResults] = await connection.execute(
+          "SELECT STATUS_ETHIC_DATE FROM status_report_data_table WHERE USER_ID = ?",
+          [userId]
+      );
 
-    res.json({ status: "success", user: user, researchStatus: researchStatus, studentData: studentData });
+      const statusEthicDate =
+          statusResults.length > 0 ? statusResults[0].STATUS_ETHIC_DATE : null;
+
+      await connection.end();
+
+      res.json({
+          status: "success",
+          user: user,
+          researchStatus: researchStatus,
+          studentData: studentData,
+          statusEthicDate: statusEthicDate,
+      });
   } catch (err) {
-    console.error("Database error:", err);
-    res.json({
-      status: "error",
-      message: "Database server error",
-      error: err.message,
-    });
+      console.error("Database error:", err);
+      res.json({
+          status: "error",
+          message: "Database server error",
+          error: err.message,
+      });
   }
 });
+
+
+
+
 
 
 
