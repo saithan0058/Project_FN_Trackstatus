@@ -55,7 +55,7 @@
     <script>
         async function fetchUserData() {
             try {
-                const response = await fetch('/getuser/678'); // ใช้ ID แทน USERNAME
+                const response = await fetch('/getuser/11725'); // ใช้ ID แทน USERNAME
                 const data = await response.json();
                 if (data.status === 'success') {
                     populateTable(data.user, data.researchStatus, data.studentData);
