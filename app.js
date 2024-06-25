@@ -181,45 +181,68 @@ app.get("/getuser/:id", async function (req, res) {
 
 
 
-
-
-
-// API for getting statistics data for specific programs
+// API สำหรับดึงข้อมูลสถิติสำหรับโปรแกรมตามปีที่เลือก
 app.get("/statistics", async function (req, res) {
+  const year = req.query.year;
   try {
-    const programIds = [487111020, 487111000, 595170203];
-    const connection = await mysql.createConnection(dbConfig);
+      const programIds = [605200303, 605120902, 605200102];
+      const connection = await mysql.createConnection(dbConfig);
 
-    // Create a query string with placeholders for each program ID
-    const placeholders = programIds.map(() => "?").join(",");
-    const query = `
-        SELECT PROGRAM, SUM(TOTAL) AS TOTAL, SUM(CANDIDATE) AS CANDIDATE, SUM(GRADUATE) AS GRADUATE, SUM(RETRY) AS RETRY, SUM(NORMAL) AS NORMAL
-        FROM statistic_report_data_table
-        WHERE PROGRAM IN (${placeholders})
-        GROUP BY PROGRAM
+      // สร้างคำสั่ง query พร้อมด้วย year parameter
+      const placeholders = programIds.map(() => "?").join(",");
+      const query = `
+          SELECT PROGRAM, SUM(TOTAL) AS TOTAL, SUM(CANDIDATE) AS CANDIDATE, SUM(GRADUATE) AS GRADUATE, SUM(RETRY) AS RETRY, SUM(NORMAL) AS NORMAL
+          FROM statistic_report_data_table
+          WHERE PROGRAM IN (${placeholders}) AND YEAR = ?
+          GROUP BY PROGRAM
       `;
 
-    const [results] = await connection.execute(query, programIds);
+      const [results] = await connection.execute(query, [...programIds, year]);
 
-    await connection.end();
+      await connection.end();
 
-    if (results.length === 0) {
-      res.json({ status: "error", message: "Programs not found" });
-      return;
-    }
+      if (results.length === 0) {
+          res.json({ status: "error", message: "Programs not found" });
+          return;
+      }
 
-    res.json({ status: "success", data: results });
+      res.json({ status: "success", data: results });
   } catch (err) {
-    console.error("Database error:", err);
-    res.json({
-      status: "error",
-      message: "Database server error",
-      error: err.message,
-    });
+      console.error("Database error:", err);
+      res.json({
+          status: "error",
+          message: "Database server error",
+          error: err.message,
+      });
   }
 });
 
-//   end
+// API สำหรับดึงปีที่มีอยู่ในฐานข้อมูล
+app.get("/years", async function (req, res) {
+  try {
+      const connection = await mysql.createConnection(dbConfig);
+      const [results] = await connection.execute("SELECT DISTINCT YEAR FROM statistic_report_data_table ORDER BY YEAR DESC");
+
+      await connection.end();
+
+      const years = results.map(row => row.YEAR);
+      res.json(years);
+  } catch (err) {
+      console.error("Database error:", err);
+      res.json({
+          status: "error",
+          message: "Database server error",
+          error: err.message,
+      });
+  }
+});
+
+
+
+
+
+
+
 
 
 // หน้า profile

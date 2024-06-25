@@ -11,6 +11,14 @@
     <div id="navbar-placeholder"></div>
     <script src="/loadlayout1"></script>
     <div class="container">
+        <!-- เพิ่ม dropdown สำหรับการเลือกปี -->
+        <div class="year-selection">
+            <label for="yearSelect">Select Year:</label>
+            <select id="yearSelect">
+                <!-- ปีที่สามารถเลือกได้จะถูกเพิ่มโดย JavaScript -->
+            </select>
+        </div>
+
         <div class="total">
             <div class="chart total-chart">
                 <canvas id="totalChart"></canvas>
@@ -121,79 +129,123 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async function () {
-            const response = await fetch('/statistics');
-            const data = await response.json();
+            let totalChart, mscChart, mengChart, phdChart;
 
-            if (data.status === 'success') {
-                const stats = data.data;
+            // ฟังก์ชันสำหรับการล้างข้อมูลเก่า
+            function clearDashboard() {
+                if (totalChart) totalChart.destroy();
+                if (mscChart) mscChart.destroy();
+                if (mengChart) mengChart.destroy();
+                if (phdChart) phdChart.destroy();
 
-                let totalStudent = 0;
-                let totalRetire = 0;
-                let totalStudying = 0;
-                let totalGraduate = 0;
+                document.getElementById('totalStudent').textContent = '';
+                document.getElementById('totalRetire').textContent = '';
+                document.getElementById('totalStudying').textContent = '';
+                document.getElementById('totalGraduate').textContent = '';
+                document.getElementById('mscStudying').textContent = '';
+                document.getElementById('mscRetired').textContent = '';
+                document.getElementById('mscGraduate').textContent = '';
+                document.getElementById('mscTotal').textContent = '';
+                document.getElementById('mscStudyingPerc').textContent = '0%';
+                document.getElementById('mscRetiredPerc').textContent = '0%';
+                document.getElementById('mscGraduatePerc').textContent = '0%';
+                document.getElementById('mengStudying').textContent = '';
+                document.getElementById('mengRetired').textContent = '';
+                document.getElementById('mengGraduate').textContent = '';
+                document.getElementById('mengTotal').textContent = '';
+                document.getElementById('mengStudyingPerc').textContent = '0%';
+                document.getElementById('mengRetiredPerc').textContent = '0%';
+                document.getElementById('mengGraduatePerc').textContent = '0%';
+                document.getElementById('phdStudying').textContent = '';
+                document.getElementById('phdRetired').textContent = '';
+                document.getElementById('phdGraduate').textContent = '';
+                document.getElementById('phdTotal').textContent = '';
+                document.getElementById('phdStudyingPerc').textContent = '0%';
+                document.getElementById('phdRetiredPerc').textContent = '0%';
+                document.getElementById('phdGraduatePerc').textContent = '0%';
+            }
 
-                // Function to update individual program stats
-                function updateProgramStats(program, prefix) {
-                    const programStats = stats.find(stat => stat.PROGRAM === program);
+            // ฟังก์ชันสำหรับการเพิ่มตัวเลือกปีใน dropdown
+            async function populateYearSelect() {
+                const years = await fetch('/years').then(res => res.json());
+                const yearSelect = document.getElementById('yearSelect');
 
-                    if (programStats) {
-                        document.getElementById(`${prefix}Studying`).textContent = programStats.NORMAL;
-                        document.getElementById(`${prefix}Retired`).textContent = programStats.CANDIDATE;
-                        document.getElementById(`${prefix}Graduate`).textContent = programStats.GRADUATE;
-                        document.getElementById(`${prefix}Total`).textContent = programStats.TOTAL;
+                // เรียงลำดับปีจากล่าสุดไปยังเก่าสุด
+                years.sort((a, b) => b - a);
 
-                        const studyingPerc = (programStats.NORMAL / programStats.TOTAL) * 100;
-                        const retiredPerc = (programStats.CANDIDATE / programStats.TOTAL) * 100;
-                        const graduatePerc = (programStats.GRADUATE / programStats.TOTAL) * 100;
-
-                        document.getElementById(`${prefix}StudyingPerc`).textContent = `${studyingPerc.toFixed(2)}%`;
-                        document.getElementById(`${prefix}RetiredPerc`).textContent = `${retiredPerc.toFixed(2)}%`;
-                        document.getElementById(`${prefix}GraduatePerc`).textContent = `${graduatePerc.toFixed(2)}%`;
-
-                        // เพิ่มค่าเข้าผลรวมทั้งหมด
-                        totalStudent += parseInt(programStats.TOTAL);
-                        totalRetire += parseInt(programStats.CANDIDATE);
-                        totalStudying += parseInt(programStats.NORMAL);
-                        totalGraduate += parseInt(programStats.GRADUATE);
-                    }
-                }
-
-                updateProgramStats(487111020, 'msc');
-                updateProgramStats(487111000, 'meng');
-                updateProgramStats(595170203, 'phd');
-
-                // อัพเดทผลรวมทั้งหมดในหน้าเว็บ
-                document.getElementById('totalStudent').textContent = totalStudent;
-                document.getElementById('totalRetire').textContent = totalRetire;
-                document.getElementById('totalStudying').textContent = totalStudying;
-                document.getElementById('totalGraduate').textContent = totalGraduate;
-
-                // Initialize total chart
-                const totalCtx = document.getElementById('totalChart').getContext('2d');
-                new Chart(totalCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Retired', 'Studying', 'Graduates'],
-                        datasets: [{
-                            data: [totalRetire, totalStudying, totalGraduate],
-                            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false
-                    }
+                years.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
                 });
+            }
 
-                // Initialize individual program charts
-                function initChart(ctxId, programStats) {
-                    const ctx = document.getElementById(ctxId).getContext('2d');
-                    new Chart(ctx, {
+            // ฟังก์ชันสำหรับการดึงข้อมูลตามปีที่เลือก
+            async function fetchDataByYear(year) {
+                const response = await fetch(`/statistics?year=${year}`);
+                const data = await response.json();
+
+                clearDashboard();
+
+                if (data.status === 'success') {
+                    const stats = data.data;
+
+                    let totalStudent = 0;
+                    let totalRetire = 0;
+                    let totalStudying = 0;
+                    let totalGraduate = 0;
+
+                    // ฟังก์ชันสำหรับอัพเดทข้อมูลตามโปรแกรม
+                    function updateProgramStats(program, prefix) {
+                        const programStats = stats.find(stat => stat.PROGRAM === program);
+
+                        if (programStats) {
+                            document.getElementById(`${prefix}Studying`).textContent = programStats.NORMAL;
+                            document.getElementById(`${prefix}Retired`).textContent = programStats.CANDIDATE;
+                            document.getElementById(`${prefix}Graduate`).textContent = programStats.GRADUATE;
+                            document.getElementById(`${prefix}Total`).textContent = programStats.TOTAL;
+
+                            const studyingPerc = (programStats.NORMAL / programStats.TOTAL) * 100;
+                            const retiredPerc = (programStats.CANDIDATE / programStats.TOTAL) * 100;
+                            const graduatePerc = (programStats.GRADUATE / programStats.TOTAL) * 100;
+
+                            document.getElementById(`${prefix}StudyingPerc`).textContent = `${studyingPerc.toFixed(2)}%`;
+                            document.getElementById(`${prefix}RetiredPerc`).textContent = `${retiredPerc.toFixed(2)}%`;
+                            document.getElementById(`${prefix}GraduatePerc`).textContent = `${graduatePerc.toFixed(2)}%`;
+
+                            totalStudent += parseInt(programStats.TOTAL);
+                            totalRetire += parseInt(programStats.CANDIDATE);
+                            totalStudying += parseInt(programStats.NORMAL);
+                            totalGraduate += parseInt(programStats.GRADUATE);
+                        } else {
+                            document.getElementById(`${prefix}Studying`).textContent = '0';
+                            document.getElementById(`${prefix}Retired`).textContent = '0';
+                            document.getElementById(`${prefix}Graduate`).textContent = '0';
+                            document.getElementById(`${prefix}Total`).textContent = '0';
+                            document.getElementById(`${prefix}StudyingPerc`).textContent = '0%';
+                            document.getElementById(`${prefix}RetiredPerc`).textContent = '0%';
+                            document.getElementById(`${prefix}GraduatePerc`).textContent = '0%';
+                        }
+                    }
+
+                    updateProgramStats(605200303, 'msc');
+                    updateProgramStats(605120902, 'meng');
+                    updateProgramStats(605200102, 'phd');
+
+                    document.getElementById('totalStudent').textContent = totalStudent;
+                    document.getElementById('totalRetire').textContent = totalRetire;
+                    document.getElementById('totalStudying').textContent = totalStudying;
+                    document.getElementById('totalGraduate').textContent = totalGraduate;
+
+                    // Initialize total chart
+                    const totalCtx = document.getElementById('totalChart').getContext('2d');
+                    totalChart = new Chart(totalCtx, {
                         type: 'doughnut',
                         data: {
                             labels: ['Retired', 'Studying', 'Graduates'],
                             datasets: [{
-                                data: [programStats.CANDIDATE, programStats.NORMAL, programStats.GRADUATE],
+                                data: [totalRetire, totalStudying, totalGraduate],
                                 backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
                             }]
                         },
@@ -202,14 +254,61 @@
                             maintainAspectRatio: false
                         }
                     });
-                }
 
-                initChart('mscChart', stats.find(stat => stat.PROGRAM === 487111020));
-                initChart('mengChart', stats.find(stat => stat.PROGRAM === 487111000));
-                initChart('phdChart', stats.find(stat => stat.PROGRAM === 595170203));
-            } else {
-                console.error('Failed to load statistics:', data.message);
+                    // Initialize individual program charts
+                    function initChart(ctxId, programStats) {
+                        const ctx = document.getElementById(ctxId).getContext('2d');
+                        if (!programStats) {
+                            return new Chart(ctx, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: ['Retired', 'Studying', 'Graduates'],
+                                    datasets: [{
+                                        data: [0, 0, 0],
+                                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false
+                                }
+                            });
+                        }
+                        return new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Retired', 'Studying', 'Graduates'],
+                                datasets: [{
+                                    data: [programStats.CANDIDATE, programStats.NORMAL, programStats.GRADUATE],
+                                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false
+                            }
+                        });
+                    }
+
+                    mscChart = initChart('mscChart', stats.find(stat => stat.PROGRAM === 605200303));
+                    mengChart = initChart('mengChart', stats.find(stat => stat.PROGRAM === 605120902));
+                    phdChart = initChart('phdChart', stats.find(stat => stat.PROGRAM === 605200102));
+                } else {
+                    console.error('Failed to load statistics:', data.message);
+                }
             }
+
+            // Event listener สำหรับการเลือกปี
+            document.getElementById('yearSelect').addEventListener('change', (event) => {
+                const selectedYear = event.target.value;
+                fetchDataByYear(selectedYear);
+            });
+
+            // เรียกใช้ฟังก์ชันเพื่อเพิ่มตัวเลือกปีใน dropdown
+            await populateYearSelect();
+            // ดึงข้อมูลตามปีแรกที่มีอยู่ใน dropdown
+            const firstYear = document.getElementById('yearSelect').value;
+            await fetchDataByYear(firstYear);
         });
     </script>
 </body>
