@@ -1,63 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timeline Guide to Graduate</title>
-    <link rel="stylesheet" href="/pages/CSS/tl.css">
-</head>
-<body>
-    <div id="navbar-placeholder"></div>
-    <script src="/loadlayout1"></script>
-    <div>
-        <div class="header">
-            <h1>Timeline Guide to Graduate</h1>
-            <div class="buttons">
-                <button>Notification</button>
-                <button style="background-color: #007bff;color: white;">Note</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Timeline Guide to Graduate</title>
+        <link rel="stylesheet" href="/pages/CSS/tl.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <div id="navbar-placeholder"></div>
+        <script src="/loadlayout1"></script>
+        <div>
+            <div class="header">
+                <h1>Timeline Guide to Graduate</h1>
+                <div class="buttons">
+                    <button>Notification</button>
+                    <button id="noteButton"
+                        style="background-color: #007bff;color: white;">Note</button>
+                </div>
             </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>TIMELINE</th>
+                        <th>STATUS DATE</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="timeline-body">
+                    <!-- Rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+            <div class="precautions">
+                <h2>Precautions students</h2>
+            </div>
+            <div class="status-explanation">
+                <span class="status safe">Safe</span>
+                <span class="status warning">Warning</span>
+                <span class="status retried">Retried</span>
+            </div>
+            <div class="precaution-list">
+                <!-- Precaution items will be inserted here by JavaScript -->
+                <div class="precaution" id="academic-year-status">1. Academic
+                    year</div>
+                <div class="precaution" id="qualifying-exam-status">2.
+                    Qualifying exam</div>
+                <div class="precaution" id="proposal-test-status">3. Proposal
+                    test</div>
+                <div class="precaution" id="english-proficiency-status">4.
+                    English proficiency score</div>
+                <div class="precaution safe">5. Take a leave</div>
+                <div class="precaution safe">6. GPAX > 3.00</div>
+                <div class="precaution warning">7. Get "U" 2 times</div>
+                <div class="precaution safe">8. Corrupt</div>
+                <div class="precaution safe">9. Payment tuition fees</div>
+            </div>
+            <br>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>TIMELINE</th>
-                    <th>STATUS DATE</th>
-                    <th>STATUS</th>
-                </tr>
-            </thead>
-            <tbody id="timeline-body">
-                <!-- Rows will be inserted here by JavaScript -->
-            </tbody>
-        </table>
-        <div class="precautions">
-            <h2>Precautions students</h2>
-        </div>
-        <div class="status-explanation">
-            <span class="status safe">Safe</span>
-            <span class="status warning">Warning</span>
-            <span class="status retried">Retried</span>
-        </div>
-        <div class="precaution-list">
-            <!-- Precaution items will be inserted here by JavaScript -->
-            <div class="precaution" id="academic-year-status">1. Academic year</div>
-            <div class="precaution" id="qualifying-exam-status">2. Qualifying exam</div>
-            <div class="precaution" id="proposal-test-status">3. Proposal test</div>
-            <div class="precaution" id="english-proficiency-status">4. English proficiency score</div>
-            <div class="precaution safe">5. Take a leave</div>
-            <div class="precaution safe">6. GPAX > 3.00</div>
-            <div class="precaution warning">7. Get "U" 2 times</div>
-            <div class="precaution safe">8. Corrupt</div>
-            <div class="precaution safe">9. Payment tuition fees</div>
-        </div>
-        <br>
-    </div>
-    <script>
+        <script>
         async function fetchUserData() {
             try {
-                const response = await fetch('/getuser/7647'); // ใช้ ID แทน USERNAME
+                const response = await fetch('/getuser/3666'); // ใช้ ID แทน USERNAME
                 const data = await response.json();
                 if (data.status === 'success') {
-                    populateTable(data.user, data.researchStatus, data.studentData, data.statusEthicDate);
+                    console.log('Data received:', data); // Add this line to debug
+                    populateTable(data.user, data.researchStatus, data.studentData, data.statusEthicDate, data.statusAdvisorDate, data.statusDefenseDate, data.researchModifyDate);
                 } else {
                     console.error(data.message);
                 }
@@ -85,7 +92,7 @@
             };
 
             const parts = dateString.trim().split(' ');
-            if (parts.length < 3) return 'N/A';  
+            if (parts.length < 4) return 'N/A';
 
             const day = parts[0].padStart(2, '0');
             const monthThai = parts[1];
@@ -97,7 +104,7 @@
             return `${day}-${month}-${year}`;
         }
 
-        function populateTable(user, researchStatus, studentData, statusEthicDate) {
+        function populateTable(user, researchStatus, studentData, statusEthicDate, statusAdvisorDate, statusDefenseDate, researchModifyDate) {
             const statusBits = getStatusBits(user.STATUS);
             const timelineBody = document.getElementById('timeline-body');
             
@@ -137,6 +144,10 @@
                 englishProficiencyStatus = 'safe';
             }
 
+            const advisorDate = formatDate(statusAdvisorDate);
+            const defenseDate = formatDate(statusDefenseDate);
+            const publishDate = formatDate(researchModifyDate);
+
             timelineBody.innerHTML = `
                 <tr>
                     <td>1 Research ethics training</td>
@@ -145,35 +156,45 @@
                 </tr>
                 <tr>
                     <td>2 Appoint a consultant</td>
-                    <td>01-01-2024</td>
+                    <td>${advisorDate}</td>
                     <td><span class="status ${researchStatus > 2 ? 'pass' : 'waiting'}">${researchStatus > 2 ? 'PASS' : 'WAITING'}</span></td>
                 </tr>
                 <tr>
                     <td>3 Propose an outline</td>
-                    <td>01-01-2024</td>
+                    <td></td>
                     <td><span class="status ${researchStatus > 3 ? 'pass' : 'waiting'}">${researchStatus > 3 ? 'PASS' : 'WAITING'}</span></td>
                 </tr>
                 <tr>
                     <td>4 Comprehensive examination</td>
-                    <td>01-01-2024</td>
+                    <td></td>
                     <td><span class="status ${getStatusClass([statusBits[4], statusBits[5]], 'comprehensive')}">${getStatusText([statusBits[4], statusBits[5]], 'comprehensive')}</span></td>
                 </tr>
                 <tr>
                     <td>5 Publish research results</td>
-                    <td>01-01-2024</td>
+                    <td>${publishDate}</td>
                     <td><span class="status ${getStatusClass(statusBits[6], 'publish')}">${getStatusText(statusBits[6], 'publish')}</span></td>
                 </tr>
                 <tr>
                     <td>6 Defense exam</td>
-                    <td>01-01-2024</td>
+                    <td>${defenseDate}</td>
                     <td><span class="status ${researchStatus > 6 ? 'pass' : 'waiting'}">${researchStatus > 6 ? 'PASS' : 'WAITING'}</span></td>
                 </tr>
                 <tr>
                     <td>7 Send printing format check</td>
-                    <td>01-01-2024</td>
+                    <td></td>
                     <td><span class="status ${researchStatus > 7 ? 'pass' : 'waiting'}">${researchStatus > 7 ? 'PASS' : 'WAITING'}</span></td>
                 </tr>
             `;
+
+            checkWarnings(startYear, [
+                { date: statusEthicDate, status: getStatusClass(statusBits[10], 'ethics') },
+                { date: statusAdvisorDate, status: researchStatus > 2 ? 'pass' : 'waiting' },
+                { date: 'N/A', status: researchStatus > 3 ? 'pass' : 'waiting' },
+                { date: 'N/A', status: getStatusClass([statusBits[4], statusBits[5]], 'comprehensive') },
+                { date: researchModifyDate, status: getStatusClass(statusBits[6], 'publish') },
+                { date: statusDefenseDate, status: researchStatus > 6 ? 'pass' : 'waiting' },
+                { date: 'N/A', status: researchStatus > 7 ? 'pass' : 'waiting' },
+            ]);
 
             // เพิ่มส่วนที่เกี่ยวข้องกับ "Academic year" ลงในหน้าตาราง
             const academicYearDiv = document.getElementById('academic-year-status');
@@ -190,6 +211,21 @@
             // เพิ่มส่วนที่เกี่ยวข้องกับ "English proficiency score" ลงในหน้าตาราง
             const englishProficiencyDiv = document.getElementById('english-proficiency-status');
             englishProficiencyDiv.className = `precaution ${englishProficiencyStatus}`;
+        }
+
+        function checkWarnings(startYear, items) {
+            const currentYear = new Date().getFullYear();
+            if (currentYear - startYear > 1) {
+                const hasWarning = items.some(item => item.status === 'waiting');
+                if (hasWarning) {
+                    Swal.fire({
+                        title: 'Warning!',
+                        text: 'You have pending tasks that need immediate attention.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
         }
 
         function getStatusBits(status) {
@@ -227,7 +263,41 @@
             }
         }
 
+      // Event listener for Note button
+document.getElementById('noteButton').addEventListener('click', async () => {
+    const { value: text } = await Swal.fire({
+        title: 'Add Note',
+        input: 'textarea',
+        inputLabel: 'Your note',
+        inputPlaceholder: 'Type your note here...',
+        showCancelButton: true,
+    });
+
+    if (text) {
+        try {
+            const response = await fetch('/updatenote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ note: text, userId: 3666 }) // ส่ง user ID ไปด้วย
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                Swal.fire('Saved!', 'Your note has been saved.', 'success');
+            } else {
+                Swal.fire('Error!', 'There was a problem saving your note.', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error!', 'There was a problem saving your note.', 'error');
+        }
+    }
+});
+
+
         fetchUserData();
     </script>
-</body>
+    </body>
 </html>

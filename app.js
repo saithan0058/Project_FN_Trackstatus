@@ -4,14 +4,17 @@ const cors = require("cors");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
-const jsonParser = bodyParser.json();
 const bcrypt = require("bcrypt");
 const dbConfig = require("./db");
 const mysql = require("mysql2/promise");
 
 const app = express();
 
+app.use(bodyParser.json()); // ใช้ body-parser เพื่อ parse application/json
+app.use(bodyParser.urlencoded({ extended: true })); // ใช้ body-parser เพื่อ parse application/x-www-form-urlencoded
+
 app.use("/public", express.static(path.join(__dirname, "/public")));
+
 
 app.get("/user", async (req, res) => {
   if (req.session.user) {
@@ -133,66 +136,86 @@ app.get("/timeline", function (req, res) {
 
 app.get("/getuser/:id", async function (req, res) {
   try {
-      const connection = await mysql.createConnection(dbConfig);
+    const connection = await mysql.createConnection(dbConfig);
 
-      // Get user data
-      const [userResults] = await connection.execute(
-          "SELECT * FROM users_data_table WHERE ID = ?",
-          [req.params.id]
-      );
+    // Get user data
+    const [userResults] = await connection.execute(
+      "SELECT * FROM users_data_table WHERE ID = ?",
+      [req.params.id]
+    );
 
-      if (userResults.length === 0) {
-          res.json({ status: "error", message: "User not found" });
-          return;
-      }
+    if (userResults.length === 0) {
+      res.json({ status: "error", message: "User not found" });
+      return;
+    }
 
-      const user = userResults[0];
-      const userId = user.ID;
+    const user = userResults[0];
+    const userId = user.ID;
 
-      // Get research data by USER_ID
-      const [researchResults] = await connection.execute(
-          "SELECT STATUS FROM research_data_table WHERE USER_ID = ?",
-          [userId]
-      );
+    // Get research data by USER_ID
+    const [researchResults] = await connection.execute(
+      "SELECT STATUS FROM research_data_table WHERE USER_ID = ?",
+      [userId]
+    );
 
-      const researchStatus =
-          researchResults.length > 0 ? researchResults[0].STATUS : null;
+    const researchStatus =
+      researchResults.length > 0 ? researchResults[0].STATUS : null;
 
-      // Get student data
-      const [studentResults] = await connection.execute(
-          "SELECT START_YEAR, FINISH_YEAR, ETHICS_TRAIN_DATE, ET_DATE FROM student_data_table WHERE USER_ID = ?",
-          [userId]
-      );
+    // Get student data
+    const [studentResults] = await connection.execute(
+      "SELECT START_YEAR, FINISH_YEAR, ETHICS_TRAIN_DATE, ET_DATE FROM student_data_table WHERE USER_ID = ?",
+      [userId]
+    );
 
-      const studentData = studentResults[0];
+    const studentData = studentResults[0];
 
-      // Get status ethic date
-      const [statusResults] = await connection.execute(
-          "SELECT STATUS_ETHIC_DATE FROM status_report_data_table WHERE USER_ID = ?",
-          [userId]
-      );
+    // Get status ethic date, status advisor date, and status defense date
+    const [statusResults] = await connection.execute(
+      "SELECT STATUS_ETHIC_DATE, STATUS_ADVISOR_DATE, STATUS_DEFENSE_DATE FROM status_report_data_table WHERE USER_ID = ?",
+      [userId]
+    );
 
-      const statusEthicDate =
-          statusResults.length > 0 ? statusResults[0].STATUS_ETHIC_DATE : null;
+    const statusEthicDate =
+      statusResults.length > 0 ? statusResults[0].STATUS_ETHIC_DATE : null;
+    const statusAdvisorDate =
+      statusResults.length > 0 ? statusResults[0].STATUS_ADVISOR_DATE : null;
+    const statusDefenseDate =
+      statusResults.length > 0 ? statusResults[0].STATUS_DEFENSE_DATE : null;
 
-      await connection.end();
+    // Get the latest research modification date
+    const [researchModifyResults] = await connection.execute(
+      "SELECT RESEARCH_MODIFY FROM research_data_table WHERE USER_ID = ? ORDER BY RESEARCH_MODIFY DESC LIMIT 1",
+      [userId]
+    );
 
-      res.json({
-          status: "success",
-          user: user,
-          researchStatus: researchStatus,
-          studentData: studentData,
-          statusEthicDate: statusEthicDate,
-      });
+    const researchModifyDate =
+      researchModifyResults.length > 0 ? researchModifyResults[0].RESEARCH_MODIFY : null;
+
+    await connection.end();
+
+    res.json({
+      status: "success",
+      user: user,
+      researchStatus: researchStatus,
+      studentData: studentData,
+      statusEthicDate: statusEthicDate,
+      statusAdvisorDate: statusAdvisorDate,
+      statusDefenseDate: statusDefenseDate,
+      researchModifyDate: researchModifyDate,
+    });
   } catch (err) {
-      console.error("Database error:", err);
-      res.json({
-          status: "error",
-          message: "Database server error",
-          error: err.message,
-      });
+    console.error("Database error:", err);
+    res.json({
+      status: "error",
+      message: "Database server error",
+      error: err.message,
+    });
   }
 });
+
+
+
+
 
 
 
@@ -204,48 +227,74 @@ app.get("/getuser/:id", async function (req, res) {
 app.get("/statistics", async function (req, res) {
   const year = req.query.year;
   try {
-      const programIds = [605200303, 605120902, 605200102];
-      const connection = await mysql.createConnection(dbConfig);
+    const programIds = [605200303, 605120902, 605200102];
+    const connection = await mysql.createConnection(dbConfig);
 
-      // สร้างคำสั่ง query พร้อมด้วย year parameter
-      const placeholders = programIds.map(() => "?").join(",");
-      const query = `
+    // สร้างคำสั่ง query พร้อมด้วย year parameter
+    const placeholders = programIds.map(() => "?").join(",");
+    const query = `
           SELECT PROGRAM, SUM(TOTAL) AS TOTAL, SUM(CANDIDATE) AS CANDIDATE, SUM(GRADUATE) AS GRADUATE, SUM(RETRY) AS RETRY, SUM(NORMAL) AS NORMAL
           FROM statistic_report_data_table
           WHERE PROGRAM IN (${placeholders}) AND YEAR = ?
           GROUP BY PROGRAM
       `;
 
-      const [results] = await connection.execute(query, [...programIds, year]);
+    const [results] = await connection.execute(query, [...programIds, year]);
 
-      await connection.end();
+    await connection.end();
 
-      if (results.length === 0) {
-          res.json({ status: "error", message: "Programs not found" });
-          return;
-      }
+    if (results.length === 0) {
+      res.json({ status: "error", message: "Programs not found" });
+      return;
+    }
 
-      res.json({ status: "success", data: results });
+    res.json({ status: "success", data: results });
   } catch (err) {
-      console.error("Database error:", err);
-      res.json({
-          status: "error",
-          message: "Database server error",
-          error: err.message,
-      });
+    console.error("Database error:", err);
+    res.json({
+      status: "error",
+      message: "Database server error",
+      error: err.message,
+    });
   }
 });
 
 // API สำหรับดึงปีที่มีอยู่ในฐานข้อมูล
 app.get("/years", async function (req, res) {
   try {
+    const connection = await mysql.createConnection(dbConfig);
+    const [results] = await connection.execute("SELECT DISTINCT YEAR FROM statistic_report_data_table ORDER BY YEAR DESC");
+
+    await connection.end();
+
+    const years = results.map(row => row.YEAR);
+    res.json(years);
+  } catch (err) {
+    console.error("Database error:", err);
+    res.json({
+      status: "error",
+      message: "Database server error",
+      error: err.message,
+    });
+  }
+});
+
+
+
+
+app.post('/updatenote', async (req, res) => {
+  const { note, userId } = req.body; // รับค่า userId ด้วย
+  try {
       const connection = await mysql.createConnection(dbConfig);
-      const [results] = await connection.execute("SELECT DISTINCT YEAR FROM statistic_report_data_table ORDER BY YEAR DESC");
+
+      // อัพเดทข้อมูลลงใน REMARK ของ student_data_table
+      await connection.execute(
+          "UPDATE student_data_table SET REMARK = ? WHERE USER_ID = ?",
+          [note, userId]
+      );
 
       await connection.end();
-
-      const years = results.map(row => row.YEAR);
-      res.json(years);
+      res.json({ status: 'success' });
   } catch (err) {
       console.error("Database error:", err);
       res.json({
@@ -255,7 +304,6 @@ app.get("/years", async function (req, res) {
       });
   }
 });
-
 
 
 
@@ -281,16 +329,16 @@ app.get("/dataprofile/:USER_ID/:RESEARCH_ID", async (req, res) => {
       params: [RESEARCH_ID],
     },
     committeeData: {
-        query: `SELECT committeeData.USER_ID, committeeData.NAME_EN, 
+      query: `SELECT committeeData.USER_ID, committeeData.NAME_EN, 
                 committeeData.COMMITTEE_LEVEL 
                 FROM committee_data_table committeeData 
                 INNER JOIN exam_data_table examData 
                 ON committeeData.EXAM_ID = examData.ID 
                 WHERE examData.RESEARCH_ID = ?
                 GROUP BY committeeData.NAME_EN, committeeData.COMMITTEE_LEVEL`,
-        params: [RESEARCH_ID],
-      },
-      
+      params: [RESEARCH_ID],
+    },
+
     userData: {
       query: "SELECT ID,STATUS,USERNAME,ROLE_ID,PICTURE FROM users_data_table WHERE ID = ?",
       params: [USER_ID],
@@ -316,7 +364,7 @@ app.get("/dataprofile/:USER_ID/:RESEARCH_ID", async (req, res) => {
               WHERE 
                 examData.RESEARCH_ID = ?`,
       params: [RESEARCH_ID],
-    },   
+    },
     studentData: {
       query: `SELECT USER_ID,NAME_EN, EMAIL, MOBILE, PLAN_VERSION, START_TERM, START_YEAR, 
                     ETHICS_TYPE, ETHICS_TRAIN_DATE, ET_TYPE, ET_DATE, ET_MORE_DETAIL, 
@@ -347,8 +395,8 @@ app.get("/dataprofile/:USER_ID/:RESEARCH_ID", async (req, res) => {
               WHERE examData.RESEARCH_ID = ?`,
       params: [RESEARCH_ID],
     },
-    
-    
+
+
   };
 
   try {

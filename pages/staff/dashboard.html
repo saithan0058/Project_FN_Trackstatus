@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Statistics</title>
-    <link rel="stylesheet" href="/pages/CSS/dashboard.css">
+    <link rel="stylesheet" href="/pages/staff/CSS/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -223,9 +224,9 @@
                             document.getElementById(`${prefix}Retired`).textContent = '0';
                             document.getElementById(`${prefix}Graduate`).textContent = '0';
                             document.getElementById(`${prefix}Total`).textContent = '0';
-                            document.getElementById(`${prefix}StudyingPerc`).textContent = '0%';
-                            document.getElementById(`${prefix}RetiredPerc`).textContent = '0%';
-                            document.getElementById(`${prefix}GraduatePerc`).textContent = '0%';
+                            document.getElementById(`${prefix}StudyingPerc}`).textContent = '0%';
+                            document.getElementById(`${prefix}RetiredPerc}`).textContent = '0%';
+                            document.getElementById(`${prefix}GraduatePerc}`).textContent = '0%';
                         }
                     }
 
